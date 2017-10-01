@@ -11,7 +11,13 @@
     "mocha": "^2.4.5",
     "mongodb": "^2.1.16",
     "morgan": "^1.7.0",
-    "object-assign":"4.1.0"
+    "object-assign":"4.1.0",
+"mustache":"^2.3.0",
+"cheerio":"^1.0.0-rc.2",
+"fs":"^0.0.1",
+"body-parser":"^1.18.2",
+"nodemailer":"^4.1.1"
+
   },
   "engine": {
     "node": "*",
@@ -25,10 +31,10 @@
     "type": "git",
     "url": "http://github.com/openshift/nodejs-ex.git"
   },
-  "author": "Steve Speicher <sspeiche@gmail.com>",
-  "license": "CC-BY-1.0",
+  "author": "Pavan",
+  "license": "",
   "bugs": {
-    "url": "http://github.com/openshift/nodejs-ex/issues"
+    "url": ""
   },
-  "homepage": "http://github.com/openshift/nodejs-ex"
+  "homepage": ""
 }
