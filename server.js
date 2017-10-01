@@ -1,7 +1,17 @@
 //  OpenShift sample Node application
 var express = require('express'),
     app     = express(),
-    morgan  = require('morgan');
+    fs      = require('fs'),
+    morgan  = require('morgan'),
+    mustache = require('mustache'),
+    cheerio = require('cheerio'),
+
+bodyParser = require('body-parser'),
+jsonParser = bodyParser.json(),
+ 
+    nodemailer = require('nodemailer');
+
+    var urlencodedParser = bodyParser.urlencoded({ extended: false });
     
 Object.assign=require('object-assign')
 
@@ -55,7 +65,7 @@ var initDb = function(callback) {
     console.log('Connected to MongoDB at: %s', mongoURL);
   });
 };
-
+app.use(express.static(__dirname + '/'));
 app.get('/', function (req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
@@ -88,6 +98,281 @@ app.get('/pagecount', function (req, res) {
     res.send('{ pageCount: -1 }');
   }
 });
+
+//======================================CODE from Old Site===========================================
+
+       app.get('/contact',function(req, res) {
+        console.log('enter 1');
+           
+          var content = fs.readFileSync('views/contact.html').toString();
+          console.log('enter 2');
+    var data ={
+            "message":""
+            }
+    var html = mustache.to_html(content,data);
+    console.log('enter 3');
+    res.send(html);
+      
+        });
+     app.get('/about', function(req, res) {
+
+
+            res.setHeader('Content-Type', 'text/html');
+            res.send(fs.readFileSync('views/about.html'));
+        });
+  
+   app.get('/subscribe', function(req, res) {
+
+
+            res.setHeader('Content-Type', 'text/html');
+            res.send(fs.readFileSync('views/newsletter.html'));
+        });
+    
+    app.get('/testimonials',function(req, res) {
+
+      var params = {};
+      var collection = database.collection('testimonials');
+       var content = fs.readFileSync('views/t.html').toString();
+      
+        collection.find(params).toArray(function(err, docs) {
+               var idx = 0;
+                var idex = 0;
+                var data = {
+                    "testimonials" : docs,
+                    "idx" : function(){
+                        return idx++;
+                    },
+                    "idex" : function(){
+                        return idex++;
+                    }
+                 };
+         
+         
+          var html = mustache.to_html(content,data);
+                   if(req.headers.type && req.headers.type == 'JSON'){
+                     html = data;
+                   }
+                   res.send(html);
+
+             })
+       
+       
+       
+       
+       
+       
+      
+           // res.setHeader('Content-Type', 'text/html');
+            //res.send(fs.readFileSync('views/t.html'));
+        });
+
+
+        app.get('/getClients',function(req, res) {
+
+            var params = {};
+            var collection = database.collection('client');
+           
+            
+              collection.find(params).toArray(function(err, docs) {
+               var idx = 0;
+                var idex = 0;
+                var data = {
+                    "clients" : docs,
+                    "idx" : function(){
+                        return idx++;
+                    },
+                    "idex" : function(){
+                        return idex++;
+                    }
+                 };
+                 
+                     res.header("Access-Control-Allow-Origin", "*");
+                     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+           
+
+                   res.send(data);
+
+             })
+             
+             
+             
+             
+             
+             
+            
+           // res.setHeader('Content-Type', 'text/html');
+            //res.send(fs.readFileSync('views/t.html'));
+        });
+
+       app.get('/getClientActivity', function(req, res) {
+
+            
+            // var params = {};
+                 console.log("In client activity ID >>>>>>>>>>>>"+req.query.id);
+
+                 var o_id = new mongo.ObjectID(req.query.id);
+
+            var params = {"_id":o_id};
+
+
+
+            var collection = database.collection('client');
+
+           
+            console.log("In client activity");
+              collection.find(params).toArray(function(err, docs) {
+               var idx = 0;
+                var idex = 0;
+                var data = {
+                    "clients" : docs,
+                    "idx" : function(){
+                        return idx++;
+                    },
+                    "idex" : function(){
+                        return idex++;
+                    }
+                 };
+                 
+                     res.header("Access-Control-Allow-Origin", "*");
+                     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+           
+                    console.log("In client activity data"+data);
+                   res.send(data);
+
+             })
+             
+             
+
+        });
+
+
+
+
+
+
+
+     app.get('/trainer-videos', function(req, res) {
+       
+      var params = {};
+      var collection = database.collection('trainingyt');
+      var content = fs.readFileSync('views/videos.html').toString();
+
+      collection.find(params).sort({"_id":-1}).toArray(function(err, docs) {
+               var idx = 0;
+                var idex = 0;
+                var data = {
+                    "videos" : docs,
+                    "idx" : function(){
+                        return idx++;
+                    },
+                    "idex" : function(){
+                        return idex++;
+                    }
+                 };
+         
+         
+        var html = mustache.to_html(content,data);
+                   if(req.headers.type && req.headers.type == 'JSON'){
+                     html = data;
+                   }
+                   res.send(html);
+
+             })
+        });
+    
+   app.get('/review', function(req, res) {
+           
+        var content = fs.readFileSync('views/treviews.html').toString();
+          var data ={
+            "message":""
+            }
+        var html = mustache.to_html(content,data);
+        res.send(html);
+      
+        });
+    
+      
+   app.get('/thankyou',function(req, res) {
+           
+        var content = fs.readFileSync('views/thanks.html').toString();
+          var data ={
+            "message":""
+            }
+        var html = mustache.to_html(content,data);
+        res.send(html);
+      
+        });  
+    
+    
+     app.get('/s-thankyou',function(req, res) {
+           
+        var content = fs.readFileSync('views/sthanks.html').toString();
+          var data ={
+            "message":""
+            }
+        var html = mustache.to_html(content,data);
+        res.send(html);
+      
+        });  
+      
+      
+    
+     app.get('/promotions',function(req, res) {
+           
+        var content = fs.readFileSync('views/promotions.html').toString();
+          var data ={
+            "message":""
+            }
+        var html = mustache.to_html(content,data);
+        res.send(html);
+      
+        });    
+    
+    app.get('/youtubeDataFeed', function(req, res) {
+        var newHtml;
+        try{
+
+          //for(var i=0;i<configModule.getChannels().length;i++){
+            var collection = database.collection('trainingyt');
+              request('https://www.youtube.com/channel/UCG7vl3IncjRSiLkhxtkB_4g/videos?shelf_id=0&view=0&sort=dd', function (error, response, html) {
+          
+
+                    var $ = cheerio.load(html);
+                    //var linkContent = ""
+                    links = $('a');
+                     $(links).each(function(i, link){
+                      var href = $(link).attr('href');
+                      var text = $(link).text();
+                      text = text.replace(new RegExp('\n', 'g'), '')
+                      text = text.trim();
+                      if(href !=undefined && href.indexOf('watch') != -1){
+                        //linkContent = linkContent+ $(link).text() + ':' + href+ '<br>';
+                        var youtubeid=href.substring(href.lastIndexOf("v=")+2,href.lastIndexOf("v=")+13);
+                        //youtubeid=youtubeid.substring(0,youtubeid.lastIndexOf("&index"));
+                        //linkContent = linkContent+ $(link).text() + ':' + youtubeid+ '<br>';
+            
+             console.log("youtube id"+youtubeid);
+                        if(youtubeid && text){
+                          var document = {'name':text.replace('\n',''), 'youtubeid':youtubeid};
+                          collection.insert(document, {w:1}, function(err, result) {});
+                        }
+                      }
+                       console.log($(link).text() + ':\n  ' + $(link).attr('href'));
+                     });
+
+
+
+              });
+
+         //}
+           res.send('Done');
+          }catch(e){
+            res.send("error");
+          }
+    });
+
+
+//============================================================================================
 
 // error handling
 app.use(function(err, req, res, next){
